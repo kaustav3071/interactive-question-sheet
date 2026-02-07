@@ -1,4 +1,5 @@
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+import { BookOpen } from 'lucide-react';
 import useSheetStore from '../store/useSheetStore';
 import TopicItem from './TopicItem';
 
@@ -17,7 +18,6 @@ export default function TopicList() {
     }
 
     if (type === 'QUESTION') {
-      // Questions within a topic
       const topicId = source.droppableId.replace('topic-questions-', '');
       if (source.droppableId === destination.droppableId) {
         reorderQuestions(topicId, source.index, destination.index);
@@ -26,16 +26,8 @@ export default function TopicList() {
     }
 
     if (type === 'SUBTOPIC_QUESTION') {
-      // Questions within a sub-topic
-      const parts = source.droppableId.replace('subtopic-questions-', '').split('-');
-      // topicId is all but last segment based on our ID format
-      // Actually, let's parse it differently since IDs contain `-`
       const srcParts = source.droppableId.match(/subtopic-questions-(.+?)-(.+)$/);
       if (srcParts && source.droppableId === destination.droppableId) {
-        // For now, we store topicId and subTopicId in the droppable ID
-        // The format is: subtopic-questions-{topicId}-{subTopicId}
-        // Since UUIDs contain dashes, let's use a different approach
-        // We'll find the topic and subtopic by matching
         const store = useSheetStore.getState();
         for (const topic of store.topics) {
           for (const st of topic.subTopics) {
@@ -73,7 +65,7 @@ export default function TopicList() {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="space-y-3"
+            className="space-y-4"
           >
             {filteredTopics.map((topic, index) => (
               <TopicItem
@@ -86,9 +78,15 @@ export default function TopicList() {
             {provided.placeholder}
 
             {filteredTopics.length === 0 && (
-              <div className="text-center py-16">
-                <p className="text-gray-500 text-lg">
-                  {searchQuery ? 'No matching questions found.' : 'No topics yet. Add your first topic!'}
+              <div className="text-center py-20">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 rounded-2xl mb-4">
+                  <BookOpen size={28} className="text-indigo-400" />
+                </div>
+                <p className="text-gray-500 text-lg font-medium">
+                  {searchQuery ? 'No matching questions found' : 'No topics yet'}
+                </p>
+                <p className="text-gray-400 text-sm mt-1">
+                  {searchQuery ? 'Try a different search term.' : 'Click "Add Topic" to get started!'}
                 </p>
               </div>
             )}

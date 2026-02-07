@@ -38,35 +38,35 @@ export default function InlineEdit({ value, onSave, onDelete, className = '', re
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleSave}
-          className="flex-1 px-2 py-1 text-sm border border-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="flex-1 px-3 py-1.5 text-sm border border-indigo-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white shadow-sm"
         />
-        <button onClick={handleSave} className="p-1 text-green-600 hover:text-green-700 cursor-pointer">
-          <Check size={14} />
+        <button onClick={handleSave} className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg cursor-pointer transition-colors">
+          <Check size={15} />
         </button>
         <button
           onClick={() => {
             setEditValue(value);
             setEditing(false);
           }}
-          className="p-1 text-gray-400 hover:text-gray-600 cursor-pointer"
+          className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors"
         >
-          <X size={14} />
+          <X size={15} />
         </button>
       </div>
     );
   }
 
   return (
-    <div className={`flex items-center gap-2 group ${className}`}>
+    <div className={`flex items-center gap-2 group/inline ${className}`}>
       <span className="flex-1 truncate">{value}</span>
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-0.5 opacity-0 group-hover/inline:opacity-100 transition-opacity">
         {renderActions && renderActions()}
         <button
           onClick={(e) => {
             e.stopPropagation();
             setEditing(true);
           }}
-          className="p-1 text-gray-400 hover:text-indigo-600 cursor-pointer"
+          className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg cursor-pointer transition-colors"
           title="Edit"
         >
           <Pencil size={13} />
@@ -77,7 +77,7 @@ export default function InlineEdit({ value, onSave, onDelete, className = '', re
               e.stopPropagation();
               onDelete();
             }}
-            className="p-1 text-gray-400 hover:text-red-600 cursor-pointer"
+            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors"
             title="Delete"
           >
             <Trash2 size={13} />
