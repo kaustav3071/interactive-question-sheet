@@ -1,0 +1,100 @@
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+import useSheetStore from '../store/useSheetStore';
+import TopicItem from './TopicItem';
+
+export default function TopicList() {
+  const { topics, searchQuery, reorderTopics, reorderQuestions, reorderSubTopicQuestions } =
+    useSheetStore();
+
+  const handleDragEnd = (result) => {
+    const { source, destination, type } = result;
+    if (!destination) return;
+    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+
+    if (type === 'TOPIC') {
+      reorderTopics(source.index, destination.index);
+      return;
+    }
+
+    if (type === 'QUESTION') {
+      // Questions within a topic
+      const topicId = source.droppableId.replace('topic-questions-', '');
+      if (source.droppableId === destination.droppableId) {
+        reorderQuestions(topicId, source.index, destination.index);
+      }
+      return;
+    }
+
+    if (type === 'SUBTOPIC_QUESTION') {
+      // Questions within a sub-topic
+      const parts = source.droppableId.replace('subtopic-questions-', '').split('-');
+      // topicId is all but last segment based on our ID format
+      // Actually, let's parse it differently since IDs contain `-`
+      const srcParts = source.droppableId.match(/subtopic-questions-(.+?)-(.+)$/);
+      if (srcParts && source.droppableId === destination.droppableId) {
+        // For now, we store topicId and subTopicId in the droppable ID
+        // The format is: subtopic-questions-{topicId}-{subTopicId}
+        // Since UUIDs contain dashes, let's use a different approach
+        // We'll find the topic and subtopic by matching
+        const store = useSheetStore.getState();
+        for (const topic of store.topics) {
+          for (const st of topic.subTopics) {
+            if (source.droppableId === `subtopic-questions-${topic.id}-${st.id}`) {
+              reorderSubTopicQuestions(topic.id, st.id, source.index, destination.index);
+              return;
+            }
+          }
+        }
+      }
+    }
+  };
+
+  const filteredTopics = searchQuery
+    ? topics.filter((t) => {
+        const topicMatch = t.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const questionMatch = t.questions.some((q) =>
+          q.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        const subTopicMatch = t.subTopics.some(
+          (st) =>
+            st.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            st.questions.some((q) =>
+              q.title.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+        );
+        return topicMatch || questionMatch || subTopicMatch;
+      })
+    : topics;
+
+  return (
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <Droppable droppableId="topics-list" type="TOPIC">
+        {(provided) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className="space-y-3"
+          >
+            {filteredTopics.map((topic, index) => (
+              <TopicItem
+                key={topic.id}
+                topic={topic}
+                index={index}
+                searchQuery={searchQuery}
+              />
+            ))}
+            {provided.placeholder}
+
+            {filteredTopics.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-gray-500 text-lg">
+                  {searchQuery ? 'No matching questions found.' : 'No topics yet. Add your first topic!'}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+}
