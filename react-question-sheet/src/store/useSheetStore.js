@@ -1,12 +1,19 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import sampleData from '../data/sampleData';
 
-const useSheetStore = create((set, get) => ({
+const useSheetStore = create(
+  persist(
+    (set, get) => ({
   topics: sampleData.topics,
   searchQuery: '',
+  difficultyFilter: 'All',       // 'All' | 'Easy' | 'Medium' | 'Hard'
+  allExpanded: false,
   
   setSearchQuery: (query) => set({ searchQuery: query }),
+  setDifficultyFilter: (filter) => set({ difficultyFilter: filter }),
+  setAllExpanded: (val) => set({ allExpanded: val }),
 
   // ========== TOPIC CRUD ==========
   addTopic: (name) =>
@@ -298,6 +305,59 @@ const useSheetStore = create((set, get) => ({
     });
     return { total, solved };
   },
-}));
+
+  // ========== NOTES ==========
+  updateQuestionNotes: (topicId, questionId, notes) =>
+    set((state) => ({
+      topics: state.topics.map((t) =>
+        t.id === topicId
+          ? { ...t, questions: t.questions.map((q) => q.id === questionId ? { ...q, notes } : q) }
+          : t
+      ),
+    })),
+
+  updateSubTopicQuestionNotes: (topicId, subTopicId, questionId, notes) =>
+    set((state) => ({
+      topics: state.topics.map((t) =>
+        t.id === topicId
+          ? {
+              ...t,
+              subTopics: t.subTopics.map((st) =>
+                st.id === subTopicId
+                  ? { ...st, questions: st.questions.map((q) => q.id === questionId ? { ...q, notes } : q) }
+                  : st
+              ),
+            }
+          : t
+      ),
+    })),
+
+  // ========== EXPORT / IMPORT / RESET ==========
+  exportData: () => {
+    const state = get();
+    return JSON.stringify({ topics: state.topics, exportedAt: new Date().toISOString() }, null, 2);
+  },
+
+  importData: (jsonString) => {
+    try {
+      const data = JSON.parse(jsonString);
+      if (data.topics && Array.isArray(data.topics)) {
+        set({ topics: data.topics });
+        return { success: true };
+      }
+      return { success: false, error: 'Invalid data format' };
+    } catch {
+      return { success: false, error: 'Invalid JSON' };
+    }
+  },
+
+  resetToSampleData: () => set({ topics: sampleData.topics }),
+}),
+    {
+      name: 'question-sheet-storage',
+      partialize: (state) => ({ topics: state.topics }),
+    }
+  )
+);
 
 export default useSheetStore;

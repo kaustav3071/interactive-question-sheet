@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { ExternalLink, GripVertical, Youtube, CheckCircle2, Circle, Pencil, Trash2 } from 'lucide-react';
+import { ExternalLink, GripVertical, Youtube, CheckCircle2, Circle, Pencil, Trash2, StickyNote, ChevronDown } from 'lucide-react';
 import { Draggable } from '@hello-pangea/dnd';
+import useSheetStore from '../store/useSheetStore';
 import QuestionForm from './QuestionForm';
 
 const difficultyConfig = {
-  Easy: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-200' },
-  Medium: { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-200' },
-  Hard: { bg: 'bg-rose-50', text: 'text-rose-600', border: 'border-rose-200' },
+  Easy: { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
+  Medium: { bg: 'bg-amber-50', text: 'text-amber-700', dot: 'bg-amber-500' },
+  Hard: { bg: 'bg-rose-50', text: 'text-rose-700', dot: 'bg-rose-500' },
 };
 
 export default function QuestionItem({
@@ -20,17 +21,38 @@ export default function QuestionItem({
   draggableId,
 }) {
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+  const [notesValue, setNotesValue] = useState(question.notes || '');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { updateQuestionNotes, updateSubTopicQuestionNotes } = useSheetStore();
 
   const handleEdit = (updated) => {
     onEdit(question.id, updated);
     setShowEditForm(false);
   };
 
-  const diff = difficultyConfig[question.difficulty] || { bg: 'bg-gray-50', text: 'text-gray-600', border: 'border-gray-200' };
+  const handleSaveNotes = () => {
+    if (subTopicId) {
+      updateSubTopicQuestionNotes(topicId, subTopicId, question.id, notesValue);
+    } else {
+      updateQuestionNotes(topicId, question.id, notesValue);
+    }
+  };
+
+  const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    onDelete(question.id);
+    setShowDeleteConfirm(false);
+  };
+
+  const diff = difficultyConfig[question.difficulty] || { bg: 'bg-slate-50', text: 'text-slate-600', dot: 'bg-slate-400' };
 
   if (showEditForm) {
     return (
-      <div className="px-4 py-4 bg-indigo-50/50 border-b border-indigo-100">
+      <div className="px-4 py-3 bg-indigo-50/30 border-b border-slate-100">
         <QuestionForm
           initialData={question}
           onSubmit={handleEdit}
@@ -47,95 +69,141 @@ export default function QuestionItem({
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className={`flex items-center px-4 py-3 border-b border-gray-100/80 transition-all group ${
+          className={`border-b border-slate-100 group ${
             snapshot.isDragging
-              ? 'bg-indigo-50 shadow-lg rounded-xl ring-1 ring-indigo-200'
-              : index % 2 === 0
-              ? 'bg-white hover:bg-slate-50/70'
-              : 'bg-gray-50/30 hover:bg-slate-50/70'
+              ? 'bg-indigo-50 shadow-md rounded-lg ring-1 ring-indigo-200'
+              : 'bg-white hover:bg-slate-50'
           }`}
         >
-          {/* Drag handle */}
-          <div
-            {...provided.dragHandleProps}
-            className="mr-2.5 text-gray-200 hover:text-gray-400 cursor-grab active:cursor-grabbing transition-colors"
-          >
-            <GripVertical size={14} />
+          <div className="flex items-center px-4 py-2.5">
+            {/* Drag handle */}
+            <div
+              {...provided.dragHandleProps}
+              className="mr-2 text-slate-200 hover:text-slate-400 cursor-grab active:cursor-grabbing"
+            >
+              <GripVertical size={14} />
+            </div>
+
+            {/* Solved toggle */}
+            <button
+              onClick={() => onToggleSolved(question.id)}
+              className="mr-3 shrink-0 cursor-pointer hover:scale-110 active:scale-95"
+              title={question.solved ? 'Mark unsolved' : 'Mark solved'}
+            >
+              {question.solved ? (
+                <CheckCircle2 size={18} className="text-emerald-500" />
+              ) : (
+                <Circle size={18} className="text-slate-300 hover:text-slate-400" />
+              )}
+            </button>
+
+            {/* Question number */}
+            <span className="text-xs text-slate-400 font-mono w-6 shrink-0">{index + 1}.</span>
+
+            {/* Title */}
+            <span
+              className={`flex-1 text-sm ${
+                question.solved
+                  ? 'line-through text-slate-400'
+                  : 'text-slate-700'
+              }`}
+            >
+              {question.title}
+            </span>
+
+            {/* Right side: badge + actions */}
+            <div className="flex items-center shrink-0 ml-auto pl-3">
+              {/* Difficulty badge */}
+              <span className={`inline-flex items-center justify-center gap-1.5 w-20 px-2 py-0.5 rounded text-xs font-medium ${diff.bg} ${diff.text}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${diff.dot}`}></span>
+                {question.difficulty}
+              </span>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end w-28 gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                {question.problemUrl && (
+                  <a
+                    href={question.problemUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md"
+                    title="Open Problem"
+                  >
+                    <ExternalLink size={13} />
+                  </a>
+                )}
+                {question.resource && (
+                  <a
+                    href={question.resource}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md"
+                    title="Video Resource"
+                  >
+                    <Youtube size={13} />
+                  </a>
+                )}
+                <button
+                  onClick={() => setShowNotes(!showNotes)}
+                  className={`p-1.5 rounded-md cursor-pointer ${
+                    question.notes ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50' : 'text-slate-400 hover:text-amber-500 hover:bg-amber-50'
+                  }`}
+                  title="Notes"
+                >
+                  <StickyNote size={12} />
+                </button>
+                <button
+                  onClick={() => setShowEditForm(true)}
+                  className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md cursor-pointer"
+                  title="Edit"
+                >
+                  <Pencil size={12} />
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md cursor-pointer"
+                  title="Delete"
+                >
+                  <Trash2 size={12} />
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Solved toggle */}
-          <button
-            onClick={() => onToggleSolved(question.id)}
-            className="mr-3 shrink-0 cursor-pointer transition-transform hover:scale-110 active:scale-95"
-            title={question.solved ? 'Mark unsolved' : 'Mark solved'}
-          >
-            {question.solved ? (
-              <CheckCircle2 size={20} className="text-emerald-500 drop-shadow-sm" />
-            ) : (
-              <Circle size={20} className="text-gray-300 hover:text-gray-400" />
-            )}
-          </button>
+          {/* Notes section */}
+          {showNotes && (
+            <div className="px-4 pb-3 pt-1 ml-12">
+              <textarea
+                value={notesValue}
+                onChange={(e) => setNotesValue(e.target.value)}
+                onBlur={handleSaveNotes}
+                placeholder="Add personal notes, approach, time complexity..."
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-amber-50/30 placeholder-slate-400 resize-none"
+                rows={2}
+              />
+            </div>
+          )}
 
-          {/* Question number */}
-          <span className="text-xs text-gray-400 font-mono w-7 shrink-0">{index + 1}.</span>
-
-          {/* Title */}
-          <span
-            className={`flex-1 text-sm leading-snug ${
-              question.solved
-                ? 'line-through text-gray-400 decoration-gray-300'
-                : 'text-gray-700 font-medium'
-            }`}
-          >
-            {question.title}
-          </span>
-
-          {/* Difficulty badge */}
-          <span
-            className={`px-2.5 py-0.5 rounded-md text-xs font-semibold mr-3 border ${diff.bg} ${diff.text} ${diff.border}`}
-          >
-            {question.difficulty}
-          </span>
-
-          {/* Actions (always visible on mobile, hover on desktop) */}
-          <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-            {question.problemUrl && (
-              <a
-                href={question.problemUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                title="Open Problem"
-              >
-                <ExternalLink size={14} />
-              </a>
-            )}
-            {question.resource && (
-              <a
-                href={question.resource}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                title="Video Resource"
-              >
-                <Youtube size={14} />
-              </a>
-            )}
-            <button
-              onClick={() => setShowEditForm(true)}
-              className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg cursor-pointer transition-colors"
-              title="Edit"
-            >
-              <Pencil size={13} />
-            </button>
-            <button
-              onClick={() => onDelete(question.id)}
-              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors"
-              title="Delete"
-            >
-              <Trash2 size={13} />
-            </button>
-          </div>
+          {/* Delete confirmation */}
+          {showDeleteConfirm && (
+            <div className="px-4 py-2.5 bg-red-50 border-t border-red-100 flex items-center justify-between">
+              <span className="text-sm text-red-700">Delete this question?</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-3 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-3 py-1 text-xs font-medium text-white bg-red-600 rounded-md hover:bg-red-700 cursor-pointer"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </Draggable>

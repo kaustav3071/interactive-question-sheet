@@ -7,6 +7,7 @@ export default function QuestionForm({ initialData, onSubmit, onCancel, submitLa
     problemUrl: initialData?.problemUrl || '',
     platform: initialData?.platform || 'leetcode',
     resource: initialData?.resource || '',
+    notes: initialData?.notes || '',
   });
 
   const handleSubmit = (e) => {
@@ -16,30 +17,31 @@ export default function QuestionForm({ initialData, onSubmit, onCancel, submitLa
       ...formData,
       title: formData.title.trim(),
       resource: formData.resource.trim() || null,
+      notes: formData.notes.trim() || '',
     });
     if (!initialData) {
-      setFormData({ title: '', difficulty: 'Medium', problemUrl: '', platform: 'leetcode', resource: '' });
+      setFormData({ title: '', difficulty: 'Medium', problemUrl: '', platform: 'leetcode', resource: '', notes: '' });
     }
   };
 
-  const inputClasses = "px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white placeholder-gray-400 transition-shadow";
+  const inputCls = "px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white placeholder-slate-400";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <form onSubmit={handleSubmit} className="space-y-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         <input
           type="text"
           placeholder="Question title *"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className={inputClasses}
+          className={inputCls}
           autoFocus
           required
         />
         <select
           value={formData.difficulty}
           onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-          className={`${inputClasses} bg-white`}
+          className={`${inputCls} bg-white`}
         >
           <option value="Easy">Easy</option>
           <option value="Medium">Medium</option>
@@ -50,12 +52,12 @@ export default function QuestionForm({ initialData, onSubmit, onCancel, submitLa
           placeholder="Problem URL"
           value={formData.problemUrl}
           onChange={(e) => setFormData({ ...formData, problemUrl: e.target.value })}
-          className={inputClasses}
+          className={inputCls}
         />
         <select
           value={formData.platform}
           onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-          className={`${inputClasses} bg-white`}
+          className={`${inputCls} bg-white`}
         >
           <option value="leetcode">LeetCode</option>
           <option value="interviewbit">InterviewBit</option>
@@ -69,21 +71,28 @@ export default function QuestionForm({ initialData, onSubmit, onCancel, submitLa
         placeholder="Video resource URL (optional)"
         value={formData.resource}
         onChange={(e) => setFormData({ ...formData, resource: e.target.value })}
-        className={`w-full ${inputClasses}`}
+        className={`w-full ${inputCls}`}
+      />
+      <textarea
+        placeholder="Notes (approach, time complexity, etc.) - optional"
+        value={formData.notes}
+        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+        className={`w-full ${inputCls} resize-none`}
+        rows={2}
       />
       <div className="flex justify-end gap-2 pt-1">
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl cursor-pointer transition-colors"
+            className="px-3.5 py-1.5 text-sm font-medium text-slate-500 hover:bg-slate-100 rounded-lg cursor-pointer"
           >
             Cancel
           </button>
         )}
         <button
           type="submit"
-          className="px-5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm shadow-indigo-200 cursor-pointer transition-all active:scale-95"
+          className="px-4 py-1.5 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer active:scale-[0.97]"
         >
           {submitLabel}
         </button>

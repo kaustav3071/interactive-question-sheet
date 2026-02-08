@@ -4,7 +4,7 @@ import useSheetStore from '../store/useSheetStore';
 import TopicItem from './TopicItem';
 
 export default function TopicList() {
-  const { topics, searchQuery, reorderTopics, reorderQuestions, reorderSubTopicQuestions } =
+  const { topics, searchQuery, difficultyFilter, allExpanded, reorderTopics, reorderQuestions, reorderSubTopicQuestions } =
     useSheetStore();
 
   const handleDragEnd = (result) => {
@@ -65,7 +65,7 @@ export default function TopicList() {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="space-y-4 pb-4"
+            className="space-y-3"
           >
             {filteredTopics.map((topic, index) => (
               <TopicItem
@@ -73,19 +73,21 @@ export default function TopicList() {
                 topic={topic}
                 index={index}
                 searchQuery={searchQuery}
+                difficultyFilter={difficultyFilter}
+                forceExpanded={allExpanded}
               />
             ))}
             {provided.placeholder}
 
             {filteredTopics.length === 0 && (
-              <div className="text-center py-20">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 rounded-2xl mb-4">
-                  <BookOpen size={28} className="text-indigo-400" />
+              <div className="text-center py-16">
+                <div className="inline-flex items-center justify-center w-14 h-14 bg-slate-100 rounded-lg mb-3">
+                  <BookOpen size={24} className="text-slate-400" />
                 </div>
-                <p className="text-gray-500 text-lg font-medium">
+                <p className="text-slate-500 font-medium">
                   {searchQuery ? 'No matching questions found' : 'No topics yet'}
                 </p>
-                <p className="text-gray-400 text-sm mt-1">
+                <p className="text-slate-400 text-sm mt-1">
                   {searchQuery ? 'Try a different search term.' : 'Click "Add Topic" to get started!'}
                 </p>
               </div>
