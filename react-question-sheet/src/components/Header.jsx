@@ -18,65 +18,66 @@ export default function Header() {
   };
 
   return (
-    <header className="relative overflow-hidden">
-      {/* Gradient background */}
-      <div className="bg-linear-to-r from-indigo-600 via-indigo-700 to-purple-700">
-        {/* Decorative circles */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32" />
-        <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-white/5 rounded-full translate-y-24" />
+    <header className="relative">
+      {/* Dark gradient background */}
+      <div
+        className="relative"
+        style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 30%, #4338ca 60%, #6366f1 100%)' }}
+      >
+        {/* Decorative glow spots */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-20 right-1/4 w-72 h-72 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #818cf8, transparent 70%)' }} />
+          <div className="absolute bottom-0 left-0 w-96 h-48 rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #a5b4fc, transparent 70%)' }} />
+        </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top row */}
-          <div className="flex items-center justify-between pt-5 pb-4">
-            {/* Logo & Title */}
-            <div className="flex items-center gap-3">
-              <div className="bg-white/15 backdrop-blur-sm text-white p-2.5 rounded-xl border border-white/20 shadow-lg shadow-indigo-900/20">
-                <BookOpen size={24} />
+          <div className="flex items-center justify-between pt-7 pb-6">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/10 text-white p-3 rounded-2xl border border-white/10">
+                <BookOpen size={26} />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white tracking-tight">Question Sheet</h1>
-                <p className="text-xs text-indigo-200 font-medium">Striver SDE Sheet</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Question Sheet</h1>
+                <p className="text-indigo-300 text-sm mt-0.5">Striver SDE Sheet</p>
               </div>
             </div>
 
-            {/* Add Topic Button */}
             <button
               onClick={() => setShowAddTopic(true)}
-              className="flex items-center gap-2 bg-white text-indigo-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-50 transition-all cursor-pointer shadow-lg shadow-indigo-900/20 active:scale-95"
+              className="flex items-center gap-2 bg-white text-indigo-700 px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-50 transition-all cursor-pointer shadow-lg active:scale-95"
             >
               <Plus size={18} strokeWidth={2.5} />
               <span className="hidden sm:inline">Add Topic</span>
             </button>
           </div>
 
-          {/* Stats row */}
-          <div className="pb-5">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+          {/* Stats bar */}
+          <div className="pb-6">
+            <div className="bg-white/[0.08] rounded-2xl px-5 py-4 border border-white/[0.08]">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                {/* Progress info */}
-                <div className="flex items-center gap-3 flex-1">
+                <div className="flex items-center gap-5 flex-1">
                   <div className="flex items-center gap-2">
-                    <BarChart3 size={18} className="text-indigo-200" />
-                    <span className="text-2xl font-bold text-white">{stats.solved}</span>
-                    <span className="text-indigo-200 text-sm">/ {stats.total} solved</span>
+                    <BarChart3 size={18} className="text-indigo-300" />
+                    <span className="text-2xl font-bold text-white tabular-nums">{stats.solved}</span>
+                    <span className="text-indigo-300 text-sm">/ {stats.total} solved</span>
                   </div>
-                  <div className="hidden sm:block h-6 w-px bg-white/20" />
+                  <div className="hidden sm:block h-6 w-px bg-white/10" />
                   <div className="hidden sm:flex items-center gap-2">
-                    <Sparkles size={14} className="text-yellow-300" />
-                    <span className="text-white font-bold text-lg">{stats.percentage}%</span>
-                    <span className="text-indigo-200 text-xs">complete</span>
+                    <Sparkles size={14} className="text-amber-300" />
+                    <span className="text-white font-bold text-lg tabular-nums">{stats.percentage}%</span>
+                    <span className="text-indigo-300 text-xs">complete</span>
                   </div>
                 </div>
 
-                {/* Search */}
                 <div className="relative w-full sm:w-auto">
-                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-300" />
+                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400" />
                   <input
                     type="text"
                     placeholder="Search questions..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full sm:w-64 pl-10 pr-10 py-2.5 text-sm bg-white/10 border border-white/15 rounded-xl text-white placeholder-indigo-300 focus:outline-none focus:bg-white/20 focus:border-white/30 transition-all"
+                    className="w-full sm:w-64 pl-10 pr-10 py-2.5 text-sm bg-white/[0.07] border border-white/10 rounded-xl text-white placeholder-indigo-400/60 focus:outline-none focus:bg-white/[0.12] focus:border-indigo-400/40 transition-all"
                   />
                   {searchQuery && (
                     <button
@@ -90,13 +91,13 @@ export default function Header() {
               </div>
 
               {/* Progress bar */}
-              <div className="mt-3 relative">
-                <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+              <div className="mt-4">
+                <div className="w-full bg-white/[0.08] rounded-full h-2 overflow-hidden">
                   <div
                     className="h-2 rounded-full transition-all duration-700 ease-out relative"
                     style={{
                       width: `${stats.percentage}%`,
-                      background: 'linear-gradient(90deg, #a5b4fc, #818cf8, #c084fc)',
+                      background: 'linear-gradient(90deg, #818cf8, #a78bfa, #c084fc)',
                     }}
                   >
                     <div className="absolute inset-0 progress-shimmer rounded-full" />

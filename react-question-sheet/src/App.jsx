@@ -3,7 +3,7 @@ import TopicList from './components/TopicList';
 
 function App() {
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/40 relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/40 relative">
       {/* Subtle background pattern */}
       <div className="fixed inset-0 opacity-[0.015] pointer-events-none" style={{
         backgroundImage: `radial-gradient(circle at 1px 1px, #6366f1 1px, transparent 0)`,

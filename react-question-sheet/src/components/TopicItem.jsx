@@ -91,15 +91,15 @@ export default function TopicItem({ topic, index, searchQuery }) {
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className={`bg-white rounded-2xl border overflow-hidden transition-all duration-200 ${
+          className={`bg-white rounded-2xl border overflow-hidden transition-all duration-200 mb-3 ${
             snapshot.isDragging
               ? 'shadow-2xl ring-2 ring-indigo-400 border-indigo-200 scale-[1.01]'
-              : 'shadow-sm hover:shadow-md border-gray-200/80'
+              : 'shadow-sm hover:shadow-lg border-gray-200/70 hover:border-gray-300/80'
           }`}
         >
           {/* Topic Header */}
           <div
-            className="flex items-center px-4 py-3.5 cursor-pointer select-none group/header"
+            className="flex items-center px-5 py-4 cursor-pointer select-none group/header"
             onClick={() => setExpanded(!isExpanded)}
           >
             {/* Drag handle */}
@@ -112,7 +112,7 @@ export default function TopicItem({ topic, index, searchQuery }) {
             </div>
 
             {/* Topic number badge */}
-            <div className={`w-8 h-8 rounded-lg bg-linear-to-br ${accentColor} flex items-center justify-center text-white text-xs font-bold mr-3 shrink-0 shadow-sm`}>
+            <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${accentColor} flex items-center justify-center text-white text-xs font-bold mr-3 shrink-0 shadow-sm`}>
               {index + 1}
             </div>
 
@@ -153,7 +153,7 @@ export default function TopicItem({ topic, index, searchQuery }) {
                   className={`h-1.5 rounded-full transition-all duration-500 ${
                     progressPercent === 100
                       ? 'bg-emerald-500'
-                      : 'bg-linear-to-r from-indigo-500 to-purple-500'
+                      : 'bg-gradient-to-r from-indigo-500 to-purple-500'
                   }`}
                   style={{ width: `${progressPercent}%` }}
                 />
@@ -165,7 +165,7 @@ export default function TopicItem({ topic, index, searchQuery }) {
           {isExpanded && (
             <div className="border-t border-gray-100">
               {/* Action buttons */}
-              <div className="px-4 py-2.5 bg-linear-to-r from-gray-50 to-slate-50 flex gap-3 flex-wrap border-b border-gray-100">
+              <div className="px-4 py-2.5 bg-gradient-to-r from-gray-50 to-slate-50 flex gap-3 flex-wrap border-b border-gray-100">
                 <button
                   onClick={() => { setShowAddQuestion(!showAddQuestion); setShowAddSubTopic(false); }}
                   className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
@@ -234,7 +234,7 @@ export default function TopicItem({ topic, index, searchQuery }) {
               {filteredSubTopics.map((subTopic) => (
                 <div key={subTopic.id} className="border-b border-gray-100 last:border-b-0">
                   <div
-                    className="flex items-center px-5 py-2.5 bg-linear-to-r from-purple-50/50 to-transparent cursor-pointer hover:from-purple-50 transition-colors"
+                    className="flex items-center px-5 py-2.5 bg-gradient-to-r from-purple-50/50 to-transparent cursor-pointer hover:from-purple-50 transition-colors"
                     onClick={() => toggleSubTopic(subTopic.id)}
                   >
                     {expandedSubTopics[subTopic.id] ? (

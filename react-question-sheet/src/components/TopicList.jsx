@@ -65,7 +65,7 @@ export default function TopicList() {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="space-y-4"
+            className="space-y-4 pb-4"
           >
             {filteredTopics.map((topic, index) => (
               <TopicItem
